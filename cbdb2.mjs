@@ -75,7 +75,21 @@ export class CoreStore {
     return idx;
   }
   
+  _assertInactive(obj) {
+    let idx = this._indexByObject.get(obj);
+    if (idx != null) {
+      // we might have seen the object earlier, which is okay,
+      // so long as it is not still using its former identity.
+      let active = (
+        this._sourceObjects[idx] === obj ||
+        this._localReplacements.get(idx) === obj
+      );
+      if (active) throw Error("Object is still active.");
+    }
+  }
+  
   replace(obj, newObj) {
+    this._assertInactive(newObj);
     // NOTE: `obj` could be an original, or an existing replacement!
     let idx = this._getIndex(obj);
     this._localReplacements.set(idx, newObj);
@@ -93,6 +107,7 @@ export class CoreStore {
   }
   
   updateOriginal(obj, newObj) {
+    this._assertInactive(newObj);
     let idx = this._getIndex(obj);
     this._sourceObjects[idx] = newObj;
     if (newObj !== null) {

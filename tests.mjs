@@ -33,32 +33,37 @@ assert.deepEqual(db.changes, [{current:obj3b, original:obj3}], "Change should ex
 
 const unsubscribe2 = db.subscribe(countNotifications);
 
+notifyCount = 0;
 db.replace(null, obj4);
 assert.equal(db.objects.length, 4, "Should have an additional object now.");
-assert.equal(notifyCount, 3, "Subscriber callback should have fired twice (once for each subscriber).");
+assert.equal(notifyCount, 2, "Subscriber callback should have fired twice (once for each subscriber).");
 assert.deepEqual(db.changes, [{current:obj3b, original:obj3},{current:obj4,original:null}], "Changes should be up-to-date.");
 
-/*
 assert.throws(() => {
   db.replace(null, obj4);
-}, "Shouldn't be allowed to add an object multiple times");
-*/
+}, "Shouldn't be allowed to add duplicate copies of an object.");
 
 db.replace(obj4, null);
 assert.deepEqual(db.changes, [{current:obj3b, original:obj3}], "Changes should filter out temporary local objects.");
 
+assert.doesNotThrow(() => {
+  db.replace(null, obj4);
+}, "Should be able to restore an earlier object if not a duplicate.");
+
+notifyCount = 0;
 unsubscribe();
 db.replace(null, obj5);
 assert.equal(db.objects.length, 5, "Should have an additional object despite same content.");
-assert.equal(notifyCount, 4, "Subscriber callback should have fired once (for remaining subscriber).");
+assert.equal(notifyCount, 1, "Subscriber callback should have fired once (for remaining subscriber).");
 
 assert.doesNotThrow(() => {
   unsubscribe2();
   unsubscribe2();
 }, "No problem calling unsubscribe helper multiple times");
 
+notifyCount = 0;
 db.replace(obj3b, obj3c);
-assert.equal(notifyCount, 4, "No additional notifications should have been received.");
+assert.equal(notifyCount, 0, "No notifications should have been received.");
 assert.equal(db.objects.length, 5, "Number of objects shouldn't change.");
 assert.notEqual(db.objects.indexOf(obj3c), -1, "New object should be listed.");
 assert.equal(db.objects.indexOf(obj3b), -1, "Old object should NOT be listed.");
