@@ -1,5 +1,5 @@
 import {
-  render, html, useState
+  render, html, useState, useRef
 } from "./vdom.mjs";
 
 import { useSyncableStore, useFilter, useIndex } from "./hooks.mjs";
@@ -19,12 +19,7 @@ const Item = ({content:d}) => {
   </div>`;
 };
 
-const List = ({}) => {
-  const items = [
-    {id:1, val:"Hello"},
-    {id:2, val:"Howdy"},
-    {id:3, val:"OK"},
-  ];
+const List = ({items}) => {
   return html`<ul>
     ${items.map(d =>
       html`<li>
@@ -40,12 +35,17 @@ const List = ({}) => {
 
 
 const LocalEditor = ({name}) => {
-  const db = useSyncableStore();
-  const matchingItems = useFilter(db, () => null, []);
-  const itemsByField = useIndex(db, () => d.id);
+  const _objs = useRef([
+    {id:1, val:"Hello"},
+    {id:2, val:"Howdy"},
+    {id:3, val:"OK"},
+  ]);
+  const db = useSyncableStore(_objs.current);
   
-  //db.replaceObject
-  //db.replaceOriginal
+  //const matchingItems = useFilter(db, () => null, []);
+  //const itemsByField = useIndex(db, () => d.id);
+  const items = db.objects;
+  console.log("HERE", items, db.objects);
   
   const [autoSave, setAutoSave] = useState(false);
   const maySave = !autoSave;
@@ -108,10 +108,14 @@ const LocalEditor = ({name}) => {
       onsubmit=${evt => {
         evt.preventDefault();
         
+        let _form = new FormData(evt.target),
+            data = Object.fromEntries(_form);
+        db.replace(null, data);
+        console.log(db.objects);
       }}
     >
-      <label>ID: <input name="new-id" size=4 /></label>
-      <label>Value: <input name="new-val" /></label>
+      <label>ID: <input name="id" size=4 /></label>
+      <label>Value: <input name="val" /></label>
       <button>Add</button>
     </form>
   </div>`;
