@@ -91,11 +91,11 @@ export class CoreStore {
   replace(obj, newObj) {
     // NOTE: `obj` could be an original, or an existing replacement!
     let idx = this._getIndex(obj);
-    this._throwIfDuplicate(newObj, idx);
-    this._localReplacements.set(idx, newObj);
     if (newObj !== null) {
+      this._throwIfDuplicate(newObj, idx);
       this._indexByObject.set(newObj, idx);
     }
+    this._localReplacements.set(idx, newObj);
     this._notifySubscribers();
   }
   
@@ -108,11 +108,11 @@ export class CoreStore {
   
   updateOriginal(obj, newObj) {
     let idx = this._getIndex(obj);
-    this._throwIfDuplicate(newObj, idx);
-    this._sourceObjects[idx] = newObj;
     if (newObj !== null) {
+      this._throwIfDuplicate(newObj, idx);
       this._indexByObject.set(newObj, idx);
     }
+    this._sourceObjects[idx] = newObj;
     this._notifySubscribers();
   }
   
