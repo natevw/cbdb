@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 
-import { CoreStore } from "./cbdb2.mjs";
+import { CoreStore } from "./cbdb.mjs";
 
 const obj1 = {thing:1},
       obj2 = {thing:2},
