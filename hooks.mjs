@@ -1,31 +1,3 @@
-import { CoreStore } from "./cbdb2.mjs";
-
-const obj1 = {thing:1},
-      obj2 = {thing:2},
-      obj3 = {currentValue:0},
-      obj4 = {another:1};
-
-let db = new CoreStore([obj1,obj2,obj3]);
-
-console.log("Initial:", db.objects, db.changes);
-
-db.subscribe(() => {
-  console.log('---');
-  console.log("Objects:", db.objects);
-  console.log("Changes:", db.changes);
-  console.log('---');
-});
-
-const obj3b = {currentValue:42};
-db.replace(obj3, obj3b);
-
-db.replace(null, obj4);
-
-db.updateOriginal(obj3, {differentValue:true});
-
-db.resolve(obj3);
-
-
 export function useSyncableStore() {
   
 }
