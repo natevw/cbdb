@@ -57,7 +57,9 @@ export class CoreStore {
         current: lclObj,
         original: srcObj
       };
-    });
+    }).filter(({current,original}) =>
+      current !== original
+    );
   }
   
   _getIndex(obj=null) {

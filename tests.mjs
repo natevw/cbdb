@@ -44,6 +44,8 @@ assert.throws(() => {
 }, "Shouldn't be allowed to add an object multiple times");
 */
 
+db.replace(obj4, null);
+assert.deepEqual(db.changes, [{current:obj3b, original:obj3}], "Changes should filter out temporary local objects.");
 
 unsubscribe();
 db.replace(null, obj5);
