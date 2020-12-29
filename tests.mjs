@@ -50,6 +50,9 @@ assert.doesNotThrow(() => {
   db.replace(null, obj4);
 }, "Should be able to restore an earlier object if not a duplicate.");
 
+db.updateOriginal(obj4, obj4);
+assert.deepEqual(db.changes, [{current:obj3b, original:obj3}], "Changes shouldn't include local objects that are identical to their originals.");
+
 notifyCount = 0;
 unsubscribe();
 db.replace(null, obj5);
