@@ -1,5 +1,5 @@
 
-class SyncableStore {
+export class CoreStore {
   
   constructor(initialObjects=[]) {
     /*
@@ -26,7 +26,7 @@ class SyncableStore {
     
     this._sourceObjects.forEach((obj, idx) => {
       // add each initial state object
-      this._indexByObject[obj] = idx;
+      this._indexByObject.set(obj, idx);
     });
     
     /*
@@ -34,10 +34,15 @@ class SyncableStore {
     keyed by each index in `_sourceObjects` which has been `replace()`d.
     */
     this._localReplacements = new Map();
+    
+    
+    // these support our simple pub-sub mechanism
+    this._subscribers = [];
+    this._next_sub_id = 0;
   }
   
   get objects() {
-    this._sourceObjects.map((obj, idx) =>
+    return this._sourceObjects.map((obj, idx) =>
       this._localReplacements.has(idx) ?
         this._localReplacements.get(idx) : obj
     ).filter((obj) =>
@@ -46,7 +51,7 @@ class SyncableStore {
   }
   
   get changes() {
-    return this._localReplacements.entries().map(([idx, lclObj]) => {
+    return Array.from(this._localReplacements.entries(), ([idx, lclObj]) => {
       let srcObj = this._sourceObjects[idx];
       return {
         current: lclObj,
@@ -75,23 +80,46 @@ class SyncableStore {
     if (newObj !== null) {
       this._indexByObject.set(newObj, idx);
     }
-    this._changed();
+    this._notifySubscribers();
   }
   
   resolve(obj) {
     // forget any local state overrides
     let idx = this._getIndex(obj);
     this._localReplacements.delete(idx);
-    this._changed();
+    this._notifySubscribers();
   }
   
   updateOriginal(obj, newObj) {
     let idx = this._getIndex(obj);
-    this._originalObjects[idx] = newObj;
+    this._sourceObjects[idx] = newObj;
     if (newObj !== null) {
       this._indexByObject.set(newObj, idx);
     }
-    this._changed();
+    this._notifySubscribers();
+  }
+  
+  
+  _notifySubscribers() {
+    // NOTE: this is currently triggered on any local/remote set!
+    // conceptually, it might only be called if a visible `value`
+    // (regardless of `version` or `source`) changes but perhaps
+    // we shouldn't assume that the UI doesn't use the metadata?
+    this._subscribers.forEach((d) => {
+      d.cb.call(this, arguments);
+    });
+  }
+  
+  _unsubscribe(id) {
+    this._subscribers = this._subscribers.filter(d => d.id !== id);
+  }
+  
+  subscribe(cb) {
+    let id = this._next_sub_id++;
+    this._subscribers.push({id,cb});
+    return () => {
+      this._unsubscribe(id);
+    };
   }
   
 }
