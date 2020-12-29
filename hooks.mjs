@@ -6,18 +6,24 @@ const obj1 = {thing:1},
       obj4 = {another:1};
 
 let db = new CoreStore([obj1,obj2,obj3]);
-console.log("Objects:", db.objects);
+
+console.log("Initial:", db.objects, db.changes);
+
+db.subscribe(() => {
+  console.log('---');
+  console.log("Objects:", db.objects);
+  console.log("Changes:", db.changes);
+  console.log('---');
+});
 
 const obj3b = {currentValue:42};
 db.replace(obj3, obj3b);
-console.log("Objects:", db.objects);
 
 db.replace(null, obj4);
-console.log("Objects:", db.objects);
 
 db.updateOriginal(obj3, {differentValue:true});
-console.log("Changes:", db.changes);
 
+db.resolve(obj3);
 
 
 export function useSyncableStore() {
