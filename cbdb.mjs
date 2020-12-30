@@ -143,7 +143,7 @@ export class CoreStore {
 
 
 
-export class NicerStore {
+export class TripleStore {
   
   constructor(initialObjects=[]) {
     this._db = new CoreStore(initialObjects);
@@ -152,21 +152,44 @@ export class NicerStore {
     this._checkEqual
   }
   
-  _determineSource(obj) {
-    if (obj === null) throw Error("BAD!");
-    let idx = this._db._getIndex(obj);
+  _getObject(key) {
+    // {key,value,version}
     
   }
   
-  
-  update(obj, orig=false) {
-    let obj0 = this._determineSource(obj);
-    if (orig) {
-      this._db.updateOriginal(obj0, obj);
-    } else {
-      this._db.replace(obj0, obj);
-    }
+  has(key) {
+    // TODO: this needs to handle (locally) `delete()`d keys somehow…
+    return this._getObject(key) !== null;
   }
+  
+  get(key) {
+    let obj = this._getObject(key);
+    if (obj) return obj.value;
+  }
+  
+  set(key, value) {
+    let obj = this._getObject(key);
+    this._db.replace(obj || null, {key,value,version:null});
+  }
+  
+  delete(key) {
+    let obj = this._getObject(key);
+    if (obj) this._db.replace(obj, null);
+  }
+  
+  // convenience function
+  update(key, props) {
+    let oldVal = this.get(key),
+        newVal = Object.assign({}, oldVal, props);
+    this.set(key, newVal);
+  }
+  
+  
+  
+  setSource(key, val) {
+    
+  }
+  
   
   
 }
