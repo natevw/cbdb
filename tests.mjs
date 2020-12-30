@@ -83,3 +83,29 @@ assert.notEqual(db.objects.indexOf(obj3v2), -1, "Replaced version of original ob
 assert.equal(db.changes.length, changesBefore.length - 1, "Should have one less change after local resolution.");
 
 console.log("Seems legit.");
+
+
+
+import { TripleStore } from "./cbdb.mjs";
+
+let kv = new TripleStore(Object.entries({
+  thing1: 1,
+  thing2: {a:true, b:false}
+}));
+//console.log(kv._db.objects);
+assert.equal(kv.get('thing1'), 1);
+assert.equal(kv.has('thing2'), true);
+
+kv.set('thing1', "one");
+assert.equal(kv.get('thing1'), "one");
+
+kv.delete('thing2');
+assert.equal(kv.has('thing2'), false);
+
+kv.set('thing2', ["a","b"]);
+assert.equal(kv.has('thing2'), true);
+assert.deepEqual(kv.get('thing2'), ["a","b"]);
+
+//console.log(kv._db.changes);
+
+console.log("The legit abides.");

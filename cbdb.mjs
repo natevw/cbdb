@@ -145,21 +145,34 @@ export class CoreStore {
 
 export class TripleStore {
   
-  constructor(initialObjects=[]) {
+  constructor(initialEntries=[]) {
+    let initialObjects = initialEntries.map(
+      ([key,value,info]) => ({key,info,value})
+    );
     this._db = new CoreStore(initialObjects);
     
     this._getKey = d => d;
-    this._checkEqual
+    this._checkEqual;
+  }
+  
+  _updateInfo(obj0, value, local) {}
+  
+  _store(obj0, obj, local) {
+    if (local) {
+      this._db.replace(obj0, obj);
+    } else {
+      this._db.updateOriginal(obj0, obj);
+    }
   }
   
   _getObject(key) {
-    // {key,value,version}
-    
+    // TODO: optimize this via an index (and/or ✨wishful✨thinking✨?)
+    return this._db.objects.find(d => d.key === key);
   }
   
   has(key) {
-    // TODO: this needs to handle (locally) `delete()`d keys somehow…
-    return this._getObject(key) !== null;
+    let obj = this._getObject(key);
+    return (obj && !obj.deleted);
   }
   
   get(key) {
@@ -167,14 +180,15 @@ export class TripleStore {
     if (obj) return obj.value;
   }
   
-  set(key, value) {
-    let obj = this._getObject(key);
-    this._db.replace(obj || null, {key,value,version:null});
+  set(key, value, local=true) {
+    let obj = this._getObject(key),
+        info = this._updateInfo(obj, value, local);
+    this._store(obj || null, {key,info,value}, local);
   }
   
-  delete(key) {
+  delete(key, local=true) {
     let obj = this._getObject(key);
-    if (obj) this._db.replace(obj, null);
+    if (obj) this._store(obj, {key,deleted:true}, local);
   }
   
   // convenience function
@@ -183,13 +197,5 @@ export class TripleStore {
         newVal = Object.assign({}, oldVal, props);
     this.set(key, newVal);
   }
-  
-  
-  
-  setSource(key, val) {
-    
-  }
-  
-  
   
 }
