@@ -140,3 +140,33 @@ export class CoreStore {
   }
   
 }
+
+
+
+export class NicerStore {
+  
+  constructor(initialObjects=[]) {
+    this._db = new CoreStore(initialObjects);
+    
+    this._getKey = d => d;
+    this._checkEqual
+  }
+  
+  _determineSource(obj) {
+    if (obj === null) throw Error("BAD!");
+    let idx = this._db._getIndex(obj);
+    
+  }
+  
+  
+  update(obj, orig=false) {
+    let obj0 = this._determineSource(obj);
+    if (orig) {
+      this._db.updateOriginal(obj0, obj);
+    } else {
+      this._db.replace(obj0, obj);
+    }
+  }
+  
+  
+}
