@@ -99,6 +99,9 @@ assert.equal(kv.has('thing2'), true);
 kv.set('thing1', "one");
 assert.equal(kv.get('thing1'), "one");
 
+kv.update('thing2', {b:true});
+assert.deepEqual(kv.get('thing2'), {a:true, b:true});
+
 kv.delete('thing2');
 assert.equal(kv.has('thing2'), false);
 
