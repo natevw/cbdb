@@ -150,9 +150,9 @@ export class TripleStore {
       ([key,value,info]) => ({key,info,value})
     );
     this._db = new CoreStore(initialObjects);
-    
-    this._getKey = d => d;
-    this._checkEqual;
+    this._byKey = new Map(
+      initialObjects.map(d => [d.key, d])
+    );
   }
   
   _updateInfo(obj0, value, local) {}
@@ -160,14 +160,17 @@ export class TripleStore {
   _store(obj0, obj, local) {
     if (local) {
       this._db.replace(obj0, obj);
+      this._byKey.set(obj.key, obj);
     } else {
       this._db.updateOriginal(obj0, obj);
+      if (!this._byKey.has(obj.key)) { 
+        this._byKey.set(obj.key, obj);
+      }
     }
   }
   
   _getObject(key) {
-    // TODO: optimize this via an index (and/or ✨wishful✨thinking✨?)
-    return this._db.objects.find(d => d.key === key);
+    return this._byKey.get(key);
   }
   
   has(key) {

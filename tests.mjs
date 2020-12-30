@@ -104,8 +104,13 @@ assert.equal(kv.has('thing2'), false);
 
 kv.set('thing2', ["a","b"]);
 assert.equal(kv.has('thing2'), true);
+
+kv.set('thing2', null, false);
 assert.deepEqual(kv.get('thing2'), ["a","b"]);
 
+kv.delete('thing2', false);
+
 //console.log(kv._db.changes);
+//console.log(kv._byKey);
 
 console.log("The legit abides.");
