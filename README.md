@@ -1,5 +1,10 @@
 # cbdb
 
+Status: this repo contains several **EXPERIMENTS** that have been abandoned and/or backburnered in an unfinished (and undocumented) state. Feel free to use the issues tracker here for discussion, but what I ended up doing instead was rewriting **[Memcouch](https://github.com/natevw/memcouch)** itself as a solution to the problems I was wrestling with.
+
+----
+
+
 `cbdb` helps you build auto-saving and auto-syncing JavaScript apps.
 
 It is an in-memory "state container" (sort of like [Redux](https://redux.js.org/) or [unistore](https://github.com/developit/unistore)) but designed to synchronize with a persistent and/or shared database (e.g. CouchDB or GraphQL) using an API adapter in the background.
